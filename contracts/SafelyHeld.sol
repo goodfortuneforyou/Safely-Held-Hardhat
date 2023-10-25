@@ -992,6 +992,30 @@ contract SafelyHeld is ERC721URIStorage {
         owner = payable(msg.sender);
     }
 
+    function updateListingPrice(uint256 _listingPrice) public payable {
+        require(
+            owner == msg.sender,
+            "only marketplace owner can update the listing price"
+        );
+        listingPrice = _listingPrice;
+    }
+
+    function getListingPrice() public view returns (uint256) {
+        return listingPrice;
+    }
+
+    function createToken(
+        string memory tokenURI,
+        uint256 price
+    ) public payable returns (uint256) {
+        _tokenIds.increment();
+        uint256 newTokenId = _tokenIds.current();
+        _mint(msg.sender, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+        createMarketItem(newTokenId, price);
+        return newTokenId;
+    }
+
     function createMarketItem(uint256 tokenId, uint256 price) private {
         require(price > 0, "price must be at least 1");
         require(
